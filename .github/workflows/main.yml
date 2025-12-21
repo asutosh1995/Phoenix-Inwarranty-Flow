@@ -43,6 +43,7 @@ jobs:
 
 
       - name : Newman report
+        if : always() ## ensure that the archive section is going to be executed whether the previous step has pass or not
         uses: actions/upload-artifact@v6.0.0
         with:
           name : Newman Report

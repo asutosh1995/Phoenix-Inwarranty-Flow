@@ -1,0 +1,82 @@
+name : Postman Collection workflow
+
+on:
+  push : 
+    branches : [main]
+  workflow_dispatch:
+  schedule :
+    - cron : 30 02 * * * ## 8 am IST
+    - cron : 00 14 * * * ## 7:30 pm IST
+    - cron : 00 06 * * 1-5 ## 11:30 am IST
+
+
+jobs:
+  run-postmantests:
+    runs-on : ubuntu-latest
+
+    steps:
+    
+      - name: Checkout the code
+        uses: actions/checkout@v6.0.1
+
+      - name : install Nodejs and npm
+        uses: actions/setup-node@v6.1.0
+        with:
+          node-version: '22'
+
+      - name : Install newman and html extra gloabally
+        run: |
+             npm install -g newman
+             npm install -g newman-reporter-htmlextra
+
+      - name : Run the postman Collection with newman
+        run : |
+              newman run 'Inwarranty-flow Collection Copy-with external csv.postman_collection.json' \
+              -e QA.postman_environment.json \
+              -r cli,htmlextra \
+              --reporter-htmlextra-export ./newman/index.html
+
+
+
+
+
+
+
+      - name : Newman report
+        if : always() ## ensure that the archive section is going to be executed whether the previous step has pass or not
+        uses: actions/upload-artifact@v6.0.0
+        with:
+          name : Newman Report
+          path : newman/*.html
+
+
+      - name : Creating github page branch
+        if : always()
+        uses: peaceiris/actions-gh-pages@v4.0.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: newman/
+
+
+      
+      - name : Send Email Notifications
+        if : always()
+        uses: dawidd6/action-send-mail@v6
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: Phoenix Inwarranty Flow Test Execution Notification
+          to: asutoshacharya1995@gmail.com
+          from: ${{ secrets.EMAIL_USERNAME }}
+          body: |
+                Hi,
+                Phoenix Inwarranty Flow has been executed.The report has been published and the URL
+                is: https://asutosh1995.github.io/Phoenix-Inwarranty-Flow/
+          
+          
+          
+          
+        
+          

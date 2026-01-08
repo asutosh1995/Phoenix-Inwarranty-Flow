@@ -61,7 +61,9 @@ You can run the project on your local system for that :
 3. Install Newman using the command : ```npm install -g newman ```.  For mac users please use sudo before it.
 4. Install Newman-reporter-htmlextra using the command :``` npm install -g newman-reporter-htmlextra```
 5. Run the newman command :
-   ``` newman run 'Inwarranty-flow Collection Copy-with external csv.postman_collection.json' \ 
+
+   ```
+              newman run 'Inwarranty-flow Collection Copy-with external csv.postman_collection.json' \ 
               -e QA.postman_environment.json \
               -r cli,htmlextra \
               --reporter-htmlextra-export ./newman/index.html
